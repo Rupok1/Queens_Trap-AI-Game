@@ -1,37 +1,45 @@
+import random
+
 import pygame, sys
 import numpy as np
+from queue import PriorityQueue
 
 # initialize pygame
 pygame.init()
 
 
 # CONSTANTS
-WIDTH = 800
+li = [3, 5, 7]
+r = random.choice(li)
+
+WIDTH = r * 160
 HEIGHT = WIDTH
-LINE_WIDTH = 15
-BOARD_ROWS = 5
+LINE_WIDTH = 5
+BOARD_ROWS = r
 BOARD_COLS = BOARD_ROWS
 SQUARE_SIZE = WIDTH/BOARD_ROWS
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-BG_COLOR = (199, 168, 97)
-LINE_COLOR = (82, 68, 38)
+BG_COLOR = (255, 206, 158)
+
+LINE_COLOR = (211, 138, 71)
 WHITE = (239, 231, 200)
-WHITE_HORSE = pygame.image.load("white_horse.png")
+WHITE_HORSE = pygame.image.load("white_queen.png")
 WHITE_HORSE = pygame.transform.scale(WHITE_HORSE, (150,150))
-BLACK_HORSE = pygame.image.load("black_horse.png")
+BLACK_HORSE = pygame.image.load("black_queen.png")
 BLACK_HORSE = pygame.transform.scale(BLACK_HORSE, (150,150))
-GRAY_HORSE = pygame.image.load("gray_horse.png")
+GRAY_HORSE = pygame.image.load("block_square.png")
 GRAY_HORSE = pygame.transform.scale(GRAY_HORSE, (155,155))
-GAME_OVER = pygame.image.load("green_horse.png")
+GAME_OVER = pygame.image.load("game_over.png")
 GAME_OVER = pygame.transform.scale(GAME_OVER, (160,160))
-RED_HORSE = pygame.image.load("red_horse.png")
-RED_HORSE = pygame.transform.scale(RED_HORSE, (160,160))
+RED_HORSE = pygame.image.load("red_queen.png")
+RED_HORSE = pygame.transform.scale(RED_HORSE, (150,150))
 LOSE = pygame.image.load("lose.png")
-LOSE = pygame.transform.scale(LOSE, (160,120))
+LOSE = pygame.transform.scale(LOSE, (120, 120))
 WIN = pygame.image.load("win.png")
-WIN = pygame.transform.scale(WIN, (160,120))
+WIN = pygame.transform.scale(WIN, (140, 140))
+
 
 # VARIABLES
 player = 1
@@ -51,10 +59,10 @@ board = np.zeros((BOARD_ROWS, BOARD_COLS))
 
 
 # Player Current Possition
-playerOneCurrentRow = -1;
-playerOneCurrentCol = -1;
-playerTwoCurrentRow = -1;
-playerTwoCurrentCol = -1;
+playerOneCurrentRow = -1
+playerOneCurrentCol = -1
+playerTwoCurrentRow = -1
+playerTwoCurrentCol = -1
 
 
 # FUNCTIONS
@@ -70,26 +78,34 @@ def draw_lines():
 
 
 def draw_figures():
+    flag = -1
     for row in range(BOARD_ROWS):
         for col in range(BOARD_COLS):
             if board[row][col] == 1:
                 if (row == playerOneCurrentRow and col == playerOneCurrentCol and losePlayer == 1 ):    #player1 lost UI
                     screen.blit(RED_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
-                    screen.blit(GAME_OVER, (320,320))
-                    screen.blit(LOSE, (320,480))
+                    #screen.blit(GAME_OVER, ((r//2)*160,(r//2)*160))
+                    #screen.blit(LOSE, ((r//2)*160,(r//2)*160))
+                    flag = 0
                 elif (row == playerOneCurrentRow and col == playerOneCurrentCol):
                     screen.blit(BLACK_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
                 else:
-                    screen.blit(GRAY_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
+                    screen.blit(GRAY_HORSE, (int( col * SQUARE_SIZE )+3, int( row * SQUARE_SIZE )+3))
             elif board[row][col] == 2:
                 if (row == playerTwoCurrentRow and col == playerTwoCurrentCol and losePlayer == 2 ):    #player2 lost UI
                     screen.blit(RED_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
-                    screen.blit(GAME_OVER, (320,320))
-                    screen.blit(WIN, (320,480))
+                    #screen.blit(GAME_OVER, (160,160))
+                    #screen.blit(WIN, (160,160))
+                    flag = 1
                 elif (row == playerTwoCurrentRow and col == playerTwoCurrentCol):
                     screen.blit(WHITE_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
                 else:
-                    screen.blit(GRAY_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
+                    screen.blit(GRAY_HORSE, (int( col * SQUARE_SIZE )+3, int( row * SQUARE_SIZE )+3))
+    if(flag == 1):
+        #screen.blit(GAME_OVER, ( (r//2)*160, (r//2)*160))
+        screen.blit(WIN, (((r // 2) * 160)+8, ((r // 2) * 160)+8))
+    elif(flag == 0):
+        screen.blit(LOSE, (((r // 2) * 160)+15, ((r // 2) * 160)+15))
 
 
 def mark_square(row, col, player):
@@ -119,7 +135,29 @@ def available_square(row, col, player):
         (currentRow+1 == row and currentCol-1 == col)or
         (currentRow == row and currentCol-1 == col)
     ))				
+def available_square_list(row, col):
+    blockable_square = []
+    x = row
+    y = col
+    if x - 1 >= 0 and y - 1 >= 0 and x - 1 < BOARD_ROWS and y - 1 < BOARD_COLS and board[x - 1][y - 1] == 0:
+        blockable_square.append((x - 1, y - 1))
+    if x - 1 >= 0 and y >= 0 and x - 1 < BOARD_ROWS and y < BOARD_COLS and board[x - 1][y] == 0:
+        blockable_square.append((x - 1, y))
+    if x - 1 >= 0 and y + 1 >= 0 and x - 1 < BOARD_ROWS and y + 1 < BOARD_COLS and board[x - 1][y + 1] == 0:
+        blockable_square.append((x - 1, y + 1))
+    if x >= 0 and y + 1 >= 0 and x < BOARD_ROWS and y + 1 < BOARD_COLS and board[x][y + 1] == 0:
+        blockable_square.append((x, y + 1))
+    if x + 1 >= 0 and y + 1 >= 0 and x + 1 < BOARD_ROWS and y + 1 < BOARD_COLS and board[x + 1][y + 1] == 0:
+        blockable_square.append((x + 1, y + 1))
 
+    if x + 1 >= 0 and y >= 0 and x + 1 < BOARD_ROWS and y < BOARD_COLS and board[x + 1][y] == 0:
+        blockable_square.append((x + 1, y))
+    if x + 1 >= 0 and y - 1 >= 0 and x + 1 < BOARD_ROWS and y - 1 < BOARD_COLS and board[x + 1][y - 1] == 0:
+        blockable_square.append((x + 1, y - 1))
+    if x >= 0 and y - 1 >= 0 and x < BOARD_ROWS and y - 1 < BOARD_COLS and board[x][y - 1] == 0:
+        blockable_square.append((x, y - 1))
+
+    return blockable_square
 def is_board_full():
     for row in range(BOARD_ROWS):
         for col in range(BOARD_COLS):
@@ -154,7 +192,7 @@ def check_lose(player):
     )
 
 def restart():
-    screen.fill( BG_COLOR )
+    screen.fill(BG_COLOR)
     draw_lines()
     for row in range(BOARD_ROWS):
         for col in range(BOARD_COLS):
@@ -422,14 +460,16 @@ def minimax(board, player, playerOneCurrentRow, playerOneCurrentCol, playerTwoCu
 draw_lines()
 
 font = pygame.font.Font(None, 36)
-
+block = -1
 # MAINLOOP---------
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
-        if event.type == pygame.MOUSEBUTTONDOWN and not game_over:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and  not game_over and (block == -1 or block == 1):
+
+            print("hi")
 
             mouseX = event.pos[0] # x
             mouseY = event.pos[1] # y
@@ -441,12 +481,13 @@ while True:
             print('Clicked row: ' + str(clicked_row))
             print('Clicked col: ' + str(clicked_col))
 
+
             if available_square( clicked_row, clicked_col, 1 ):
                 player = 1
                 mark_square( clicked_row, clicked_col, player )
 
-                playerOneCurrentRow = clicked_row;
-                playerOneCurrentCol = clicked_col;
+                playerOneCurrentRow = clicked_row
+                playerOneCurrentCol = clicked_col
                 print('Player One Current Row and Col: (',str(playerOneCurrentRow)+','+str(playerOneCurrentCol)+')')
 
 
@@ -455,7 +496,9 @@ while True:
                     game_over = True
                     draw_figures()
 
+
                 else:
+
                     player = 2
                     bestMove(player)
 
@@ -468,6 +511,82 @@ while True:
                         print("********************************************************")
                     
                     draw_figures()
+            if block == -1:
+                block = 1
+            else:
+                block = 2
+            print(playerOneCurrentRow,playerOneCurrentCol," ",playerTwoCurrentRow, playerTwoCurrentCol)
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and not game_over and block == 2:
+            print("hi 2")
+
+            mouseX = event.pos[0]  # x
+            mouseY = event.pos[1]  # y
+
+            clicked_row = int(mouseY // SQUARE_SIZE)
+            clicked_col = int(mouseX // SQUARE_SIZE)
+            # print('Mouse X position: ' + str(mouseX))
+            # print('Mouse Y position: ' + str(mouseY))
+            print('Clicked row: ' + str(clicked_row))
+            print('Clicked col: ' + str(clicked_col))
+
+            if board[clicked_row][clicked_col] == 0:
+                mark_square(clicked_row, clicked_col, 1)
+
+            if check_lose(2):
+                losePlayer = 2
+                game_over = True
+                draw_figures()
+            else:
+                blockable_square_list = available_square_list(playerOneCurrentRow, playerOneCurrentCol)
+                # x = playerOneCurrentRow
+                # y = playerOneCurrentCol
+
+                # if x - 1 >= 0 and y - 1 >= 0 and x - 1 < BOARD_ROWS and y - 1 < BOARD_COLS and board[x - 1][y - 1] == 0 :
+                #     blockable_square_2.append((x-1, y-1))
+                # if x - 1 >= 0 and y >= 0 and x - 1 < BOARD_ROWS and y < BOARD_COLS and board[x - 1][y] == 0:
+                #     blockable_square_2.append((x-1, y))
+                # if x - 1 >= 0 and y + 1 >= 0 and x - 1 < BOARD_ROWS and y + 1 < BOARD_COLS and board[x - 1][y + 1] == 0:
+                #     blockable_square_2.append((x-1, y + 1))
+                # if x >= 0 and y + 1 >= 0 and x  < BOARD_ROWS and y + 1 < BOARD_COLS and board[x][y + 1] == 0:
+                #     blockable_square_2.append((x, y + 1))
+                # if x+1 >= 0 and y + 1 >= 0 and x + 1 < BOARD_ROWS and y + 1 < BOARD_COLS and board[x + 1][y + 1] == 0:
+                #     blockable_square_2.append((x + 1, y + 1))
+                #
+                # if x+1 >= 0 and y >= 0 and x + 1 < BOARD_ROWS and y< BOARD_COLS and board[x + 1][y] == 0:
+                #     blockable_square_2.append((x + 1, y))
+                # if x+1 >= 0 and y - 1 >= 0 and x + 1 < BOARD_ROWS and y - 1 < BOARD_COLS and board[x + 1][y - 1] == 0:
+                #     blockable_square_2.append((x + 1, y - 1))
+                # if x  >= 0 and y - 1 >= 0 and x < BOARD_ROWS and y - 1 < BOARD_COLS and board[x ][y - 1] == 0:
+                #     blockable_square_2.append((x, y - 1))
+
+                print(blockable_square_list,"\n")
+
+                pq = PriorityQueue()
+                for (u, v) in blockable_square_list:
+                    print(u,v)
+                    li = available_square_list(u, v)
+                    print(li)
+                    pq.put((len(li) * -1, (u, v)))
+
+                xy = pq.get()
+
+                (x, y) = xy[1]
+                while not pq.empty():
+                    current = pq.get()
+                    print(current)
+
+                print(x, y)
+
+                mark_square(x, y, 2)
+
+                if check_lose(1):
+                    losePlayer = 1
+                    game_over = True
+                    draw_figures()
+            block = 1
+
+            draw_figures()
+
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
@@ -475,10 +594,11 @@ while True:
                 player = 1
                 game_over = False
                 losePlayer = 0
-                playerOneCurrentRow = -1;
-                playerOneCurrentCol = -1;
-                playerTwoCurrentRow = -1;
-                playerTwoCurrentCol = -1;
+                playerOneCurrentRow = -1
+                playerOneCurrentCol = -1
+                playerTwoCurrentRow = -1
+                playerTwoCurrentCol = -1
+                block = -1
             
             elif event.key == pygame.K_q:
                 pygame.display.quit()
