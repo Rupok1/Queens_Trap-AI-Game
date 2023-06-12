@@ -9,36 +9,38 @@ pygame.init()
 
 
 # CONSTANTS
-li = [3, 5, 7]
-r = random.choice(li)
+# li = [3, 5]
+# r = random.choice(li)
 
-WIDTH = r * 160
+WIDTH = 600
 HEIGHT = WIDTH
-LINE_WIDTH = 5
-BOARD_ROWS = r
+r = 0
+LINE_WIDTH = 0
+BOARD_ROWS = 1
 BOARD_COLS = BOARD_ROWS
 SQUARE_SIZE = WIDTH/BOARD_ROWS
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+BLACK = (0, 0, 0)
 BG_COLOR = (255, 206, 158)
 
 LINE_COLOR = (211, 138, 71)
-WHITE = (239, 231, 200)
+WHITE = (255, 255, 255)
 WHITE_HORSE = pygame.image.load("white_queen.png")
-WHITE_HORSE = pygame.transform.scale(WHITE_HORSE, (150,150))
+WHITE_HORSE = pygame.transform.scale(WHITE_HORSE, (90, 90))
 BLACK_HORSE = pygame.image.load("black_queen.png")
-BLACK_HORSE = pygame.transform.scale(BLACK_HORSE, (150,150))
+BLACK_HORSE = pygame.transform.scale(BLACK_HORSE, (90, 90))
 GRAY_HORSE = pygame.image.load("block_square.png")
-GRAY_HORSE = pygame.transform.scale(GRAY_HORSE, (155,155))
+GRAY_HORSE = pygame.transform.scale(GRAY_HORSE, (95, 95))
 GAME_OVER = pygame.image.load("game_over.png")
 GAME_OVER = pygame.transform.scale(GAME_OVER, (160,160))
 RED_HORSE = pygame.image.load("red_queen.png")
-RED_HORSE = pygame.transform.scale(RED_HORSE, (150,150))
+RED_HORSE = pygame.transform.scale(RED_HORSE, (90, 90))
 LOSE = pygame.image.load("lose.png")
-LOSE = pygame.transform.scale(LOSE, (120, 120))
+LOSE = pygame.transform.scale(LOSE, (70, 70))
 WIN = pygame.image.load("win.png")
-WIN = pygame.transform.scale(WIN, (140, 140))
+WIN = pygame.transform.scale(WIN, (80, 80))
 
 
 # VARIABLES
@@ -49,12 +51,11 @@ losePlayer = 0
 
 # SCREEN
 screen = pygame.display.set_mode( (WIDTH, HEIGHT) )
-pygame.display.set_caption( 'Isolation Game' )
+pygame.display.set_caption('QUEEN\'s TRAP')
 screen.fill( BG_COLOR )
 
 
 # CONSOLE BOARD
-board = np.zeros((BOARD_ROWS, BOARD_COLS))
 
 
 
@@ -68,7 +69,7 @@ playerTwoCurrentCol = -1
 # FUNCTIONS
 def draw_lines():
 
-    for i in range(1,BOARD_ROWS):
+    for i in range(1, BOARD_ROWS):
         # horizontal
         pygame.draw.line( screen, LINE_COLOR, (0, SQUARE_SIZE*i), (WIDTH, SQUARE_SIZE*i), LINE_WIDTH )
 
@@ -103,9 +104,9 @@ def draw_figures():
                     screen.blit(GRAY_HORSE, (int( col * SQUARE_SIZE )+3, int( row * SQUARE_SIZE )+3))
     if(flag == 1):
         #screen.blit(GAME_OVER, ( (r//2)*160, (r//2)*160))
-        screen.blit(WIN, (((r // 2) * 160)+8, ((r // 2) * 160)+8))
+        screen.blit(WIN, (((r // 2) * 100)+8, ((r // 2) * 100)+8))
     elif(flag == 0):
-        screen.blit(LOSE, (((r // 2) * 160)+15, ((r // 2) * 160)+15))
+        screen.blit(LOSE, (((r // 2) * 100)+15, ((r // 2) * 100)+15))
 
 
 def mark_square(row, col, player):
@@ -456,13 +457,126 @@ def minimax(board, player, playerOneCurrentRow, playerOneCurrentCol, playerTwoCu
 
 
 
+class Button():
 
+    def __init__(self, x, y, image):
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.clicked = False
+    def draw(self):
+
+        action = False
+
+        pos = pygame.mouse.get_pos()
+
+        if self.rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                action = True
+
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+        return action
+
+
+board = np.zeros((BOARD_ROWS, BOARD_COLS))
+r = 0
+
+
+def start():
+
+    global LINE_WIDTH, BOARD_ROWS, BOARD_COLS, WIDTH, HEIGHT, SQUARE_SIZE, board, screen, r
+    font = pygame.font.SysFont(None, 45)
+    font.set_italic(True)
+    font2 = pygame.font.SysFont(None, 25)
+    img = font.render('WELCOME to QUEEN\'s TRAP GAME', True, BLACK)
+    img2 = font.render('Select board size', True, BLACK)
+    img3 = font2.render('Developed by Subah Nawar & Humayan Kabir', True, BLACK)
+    img4 = pygame.image.load('blur_logo.png')
+    #img4 = pygame.transform.scale(img4, (100,100))
+
+    text_rect = img.get_rect(center=(WIDTH // 2, 100))
+    text_rect2 = img2.get_rect(center=((WIDTH // 2), 250))
+    text_rect3 = img3.get_rect(center=(280, 550))
+
+    screen.blit(img4, (0, 0))
+    screen.blit(img, text_rect)
+    screen.blit(img2, text_rect2)
+    screen.blit(img3, text_rect3)
+
+
+    button_3_img = pygame.image.load('button_3.png').convert_alpha()
+    button_5_img = pygame.image.load('button_5.png').convert_alpha()
+    button_7_img = pygame.image.load('button_7.png').convert_alpha()
+
+    button_3 = Button(100, 350, button_3_img)
+    button_5 = Button(300, 350, button_5_img)
+    button_7 = Button(500, 350, button_7_img)
+
+    select = True
+
+    button_3.draw()
+    button_5.draw()
+    button_7.draw()
+    while select:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_3.draw() == True:
+                    r = 3
+                    select = False
+                elif button_5.draw() == True:
+                    r = 5
+                    select = False
+                if button_7.draw() == True:
+                    r = 7
+                    select = False
+
+        # button_5.draw()
+        # button_7.draw()
+        pygame.display.update()
+
+    LINE_WIDTH = 5
+    BOARD_ROWS = r
+    WIDTH = r * 100
+    HEIGHT = WIDTH
+    BOARD_COLS = BOARD_ROWS
+    SQUARE_SIZE = WIDTH / BOARD_ROWS
+
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    print(WIDTH, HEIGHT)
+    pygame.display.set_caption('Isolation Game')
+    screen.fill(BG_COLOR)
+    board = np.zeros((BOARD_ROWS, BOARD_COLS))
+
+
+block = -1
+start()
 draw_lines()
 
-font = pygame.font.Font(None, 36)
-block = -1
+random_block = []
+for x in range(BOARD_ROWS):
+    for y in range(BOARD_COLS):
+        random_block.append((x, y))
+random_block_list = random.sample(random_block, r//2)
+
+cnt = 1
+for u, v in random_block_list:
+    if cnt%2:
+        mark_square(u, v, 1)
+    else:
+        mark_square(u, v, 2)
+    cnt += 1
+draw_figures()
+
 # MAINLOOP---------
 while True:
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -599,7 +713,24 @@ while True:
                 playerTwoCurrentRow = -1
                 playerTwoCurrentCol = -1
                 block = -1
-            
+            if event.key == pygame.K_b:
+
+                WIDTH = 600
+                HEIGHT = WIDTH
+                screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                pygame.display.set_caption('Isolation Game')
+                screen.fill(BG_COLOR)
+                start()
+                draw_lines()
+                player = 1
+                game_over = False
+                losePlayer = 0
+                playerOneCurrentRow = -1
+                playerOneCurrentCol = -1
+                playerTwoCurrentRow = -1
+                playerTwoCurrentCol = -1
+                block = -1
+
             elif event.key == pygame.K_q:
                 pygame.display.quit()
 
