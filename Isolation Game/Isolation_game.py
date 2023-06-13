@@ -547,8 +547,7 @@ def start():
     SQUARE_SIZE = WIDTH / BOARD_ROWS
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    print(WIDTH, HEIGHT)
-    pygame.display.set_caption('Isolation Game')
+    pygame.display.set_caption('QUEEN\'s TRAP')
     screen.fill(BG_COLOR)
     board = np.zeros((BOARD_ROWS, BOARD_COLS))
 
