@@ -1,4 +1,4 @@
-# Ai-Isolation-Game
+# QUEEN's TRAP: Ai-Isolation-Game
 
 Isolation board game is a two-player “don’t get stranded” abstract strategy game of perfect information played on a nxn board. The board game is one of a series of 2 player strategy games by Lakeside from the 1970s.
 Players alternate turns moving a single piece from one cell to another on a board. The board is initially filled with squares except the starting points of both players.
