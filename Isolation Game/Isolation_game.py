@@ -27,20 +27,18 @@ BG_COLOR = (255, 206, 158)
 
 LINE_COLOR = (211, 138, 71)
 WHITE = (255, 255, 255)
-WHITE_HORSE = pygame.image.load("white_queen.png")
-WHITE_HORSE = pygame.transform.scale(WHITE_HORSE, (90, 90))
-BLACK_HORSE = pygame.image.load("black_queen.png")
-BLACK_HORSE = pygame.transform.scale(BLACK_HORSE, (90, 90))
-GRAY_HORSE = pygame.image.load("block_square.png")
-GRAY_HORSE = pygame.transform.scale(GRAY_HORSE, (95, 95))
-GAME_OVER = pygame.image.load("game_over.png")
-GAME_OVER = pygame.transform.scale(GAME_OVER, (160,160))
-RED_HORSE = pygame.image.load("red_queen.png")
-RED_HORSE = pygame.transform.scale(RED_HORSE, (90, 90))
+WHITE_QUEEN = pygame.image.load("white_queen.png")
+WHITE_QUEEN = pygame.transform.scale(WHITE_QUEEN, (90, 90))
+BLACK_QUEEN = pygame.image.load("black_queen.png")
+BLACK_QUEEN = pygame.transform.scale(BLACK_QUEEN, (90, 90))
+BLOCK_SQUARE = pygame.image.load("block_square.png")
+BLOCK_SQUARE = pygame.transform.scale(BLOCK_SQUARE, (95, 95))
+RED_QUEEN = pygame.image.load("red_queen.png")
+RED_QUEEN = pygame.transform.scale(RED_QUEEN, (90, 90))
 LOSE = pygame.image.load("lose.png")
 LOSE = pygame.transform.scale(LOSE, (70, 70))
 WIN = pygame.image.load("win.png")
-WIN = pygame.transform.scale(WIN, (80, 80))
+WIN = pygame.transform.scale(WIN, (90, 90))
 
 
 # VARIABLES
@@ -50,7 +48,7 @@ losePlayer = 0
 
 
 # SCREEN
-screen = pygame.display.set_mode( (WIDTH, HEIGHT) )
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('QUEEN\'s TRAP')
 screen.fill( BG_COLOR )
 
@@ -84,24 +82,24 @@ def draw_figures():
         for col in range(BOARD_COLS):
             if board[row][col] == 1:
                 if (row == playerOneCurrentRow and col == playerOneCurrentCol and losePlayer == 1 ):    #player1 lost UI
-                    screen.blit(RED_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
+                    screen.blit(RED_QUEEN, (int(col * SQUARE_SIZE), int(row * SQUARE_SIZE)))
                     #screen.blit(GAME_OVER, ((r//2)*160,(r//2)*160))
                     #screen.blit(LOSE, ((r//2)*160,(r//2)*160))
                     flag = 0
                 elif (row == playerOneCurrentRow and col == playerOneCurrentCol):
-                    screen.blit(BLACK_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
+                    screen.blit(BLACK_QUEEN, (int(col * SQUARE_SIZE), int(row * SQUARE_SIZE)))
                 else:
-                    screen.blit(GRAY_HORSE, (int( col * SQUARE_SIZE )+3, int( row * SQUARE_SIZE )+3))
+                    screen.blit(BLOCK_SQUARE, (int(col * SQUARE_SIZE) + 3, int(row * SQUARE_SIZE) + 3))
             elif board[row][col] == 2:
                 if (row == playerTwoCurrentRow and col == playerTwoCurrentCol and losePlayer == 2 ):    #player2 lost UI
-                    screen.blit(RED_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
+                    screen.blit(RED_QUEEN, (int(col * SQUARE_SIZE), int(row * SQUARE_SIZE)))
                     #screen.blit(GAME_OVER, (160,160))
                     #screen.blit(WIN, (160,160))
                     flag = 1
                 elif (row == playerTwoCurrentRow and col == playerTwoCurrentCol):
-                    screen.blit(WHITE_HORSE, (int( col * SQUARE_SIZE ), int( row * SQUARE_SIZE )))
+                    screen.blit(WHITE_QUEEN, (int(col * SQUARE_SIZE), int(row * SQUARE_SIZE)))
                 else:
-                    screen.blit(GRAY_HORSE, (int( col * SQUARE_SIZE )+3, int( row * SQUARE_SIZE )+3))
+                    screen.blit(BLOCK_SQUARE, (int(col * SQUARE_SIZE) + 3, int(row * SQUARE_SIZE) + 3))
     if(flag == 1):
         #screen.blit(GAME_OVER, ( (r//2)*160, (r//2)*160))
         screen.blit(WIN, (((r // 2) * 100)+8, ((r // 2) * 100)+8))
@@ -484,11 +482,11 @@ class Button():
 
 board = np.zeros((BOARD_ROWS, BOARD_COLS))
 r = 0
-
+random_block_list = []
 
 def start():
 
-    global LINE_WIDTH, BOARD_ROWS, BOARD_COLS, WIDTH, HEIGHT, SQUARE_SIZE, board, screen, r
+    global LINE_WIDTH, BOARD_ROWS, BOARD_COLS, WIDTH, HEIGHT, SQUARE_SIZE, board, screen, r, random_block_list
     font = pygame.font.SysFont(None, 45)
     font.set_italic(True)
     font2 = pygame.font.SysFont(None, 25)
@@ -554,25 +552,28 @@ def start():
     screen.fill(BG_COLOR)
     board = np.zeros((BOARD_ROWS, BOARD_COLS))
 
+    random_block = []
+    for x in range(BOARD_ROWS):
+        for y in range(BOARD_COLS):
+            random_block.append((x, y))
+    random_block_list = random.sample(random_block, r // 2)
+
+    cnt = 1
+    for u, v in random_block_list:
+        if cnt % 2:
+            mark_square(u, v, 1)
+        else:
+            mark_square(u, v, 2)
+        cnt += 1
+    draw_figures()
+
+
 
 block = -1
 start()
 draw_lines()
 
-random_block = []
-for x in range(BOARD_ROWS):
-    for y in range(BOARD_COLS):
-        random_block.append((x, y))
-random_block_list = random.sample(random_block, r//2)
 
-cnt = 1
-for u, v in random_block_list:
-    if cnt%2:
-        mark_square(u, v, 1)
-    else:
-        mark_square(u, v, 2)
-    cnt += 1
-draw_figures()
 
 # MAINLOOP---------
 while True:
@@ -718,7 +719,7 @@ while True:
                 WIDTH = 600
                 HEIGHT = WIDTH
                 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-                pygame.display.set_caption('Isolation Game')
+                pygame.display.set_caption('QUEEN\'s TRAP')
                 screen.fill(BG_COLOR)
                 start()
                 draw_lines()
