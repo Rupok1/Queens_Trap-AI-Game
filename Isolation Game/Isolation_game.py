@@ -1,17 +1,13 @@
 import random
-import time
+
 
 import pygame, sys
 import numpy as np
 from queue import PriorityQueue
 
-# initialize pygame
+
 pygame.init()
 
-
-# CONSTANTS
-# li = [3, 5]
-# r = random.choice(li)
 
 WIDTH = 600
 HEIGHT = WIDTH
@@ -43,76 +39,65 @@ LOSE = pygame.transform.scale(LOSE, (70, 70))
 WIN = pygame.image.load("win.png")
 WIN = pygame.transform.scale(WIN, (90, 90))
 
-WHITE_DOT = pygame.image.load('white_dot.png')
-WHITE_DOT = pygame.transform.scale(BLOCK_SQUARE, (95, 95))
+GREEN_DOT = pygame.image.load('dot.png')
+GREEN_DOT = pygame.transform.scale(GREEN_DOT, (90, 90))
+
+BG_DOT = pygame.image.load('dot_2.png')
+BG_DOT = pygame.transform.scale(BG_DOT, (90, 90))
 
 
-# VARIABLES
 player = 1
 game_over = False
 losePlayer = 0
 
 
-# SCREEN
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('QUEEN\'s TRAP')
 screen.fill( BG_COLOR )
 
 
-# CONSOLE BOARD
-
-
-
-# Player Current Possition
 playerOneCurrentRow = -1
 playerOneCurrentCol = -1
 playerTwoCurrentRow = -1
 playerTwoCurrentCol = -1
 
 
-# FUNCTIONS
 def draw_lines():
 
-    for i in range(1, BOARD_ROWS+1):
+    for i in range(0, BOARD_ROWS+1):
         # horizontal
         pygame.draw.line(screen, LINE_COLOR, (0, SQUARE_SIZE* i), (WIDTH, SQUARE_SIZE * i), LINE_WIDTH)
 
-    for i in range(1, BOARD_COLS):
+    for i in range(0, BOARD_COLS+1):
         # vertical
         pygame.draw.line(screen, LINE_COLOR, (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT), LINE_WIDTH)
 
 
 def draw_figures():
 
-    print("board: ",board)
-
     flag = -1
     print(BOARD_ROWS,BOARD_COLS)
     for row in range(BOARD_ROWS):
         for col in range(BOARD_COLS):
             if board[row][col] == 1:
-                if (row == playerOneCurrentRow and col == playerOneCurrentCol and losePlayer == 1 ):    #player1 lost UI
+                if (row == playerOneCurrentRow and col == playerOneCurrentCol and losePlayer == 1 ):
                     screen.blit(RED_QUEEN, (int(col * SQUARE_SIZE), int(row * SQUARE_SIZE)))
-                    #screen.blit(GAME_OVER, ((r//2)*160,(r//2)*160))
-                    #screen.blit(LOSE, ((r//2)*160,(r//2)*160))
                     flag = 0
                 elif (row == playerOneCurrentRow and col == playerOneCurrentCol):
                     screen.blit(BLACK_QUEEN, (int(col * SQUARE_SIZE), int(row * SQUARE_SIZE)))
                 else:
                     screen.blit(BLOCK_SQUARE, (int(col * SQUARE_SIZE) + 3, int(row * SQUARE_SIZE) + 3))
             elif board[row][col] == 2:
-                if (row == playerTwoCurrentRow and col == playerTwoCurrentCol and losePlayer == 2 ):    #player2 lost UI
+                if (row == playerTwoCurrentRow and col == playerTwoCurrentCol and losePlayer == 2 ):
                     screen.blit(RED_QUEEN, (int(col * SQUARE_SIZE), int(row * SQUARE_SIZE)))
-                    #screen.blit(GAME_OVER, (160,160))
-                    #screen.blit(WIN, (160,160))
                     flag = 1
                 elif (row == playerTwoCurrentRow and col == playerTwoCurrentCol):
                     screen.blit(WHITE_QUEEN, (int(col * SQUARE_SIZE), int(row * SQUARE_SIZE)))
                 else:
                     screen.blit(BLOCK_SQUARE, (int(col * SQUARE_SIZE)+3, int(row * SQUARE_SIZE)+3))
     if(flag == 1):
-        #screen.blit(GAME_OVER, ( (r//2)*160, (r//2)*160))
-        screen.blit(WIN, (((r // 2) * 100)+8, ((s // 2) * 100)+8))
+        screen.blit(WIN, (((r // 2) * 100)+5, ((s // 2) * 100)+5))
+
     elif(flag == 0):
         screen.blit(LOSE, (((r // 2) * 100)+15, ((s // 2) * 100)+15))
 
@@ -167,16 +152,8 @@ def available_square_list(row, col):
         blockable_square.append((x, y - 1))
 
     return blockable_square
-def is_board_full():
-    for row in range(BOARD_ROWS):
-        for col in range(BOARD_COLS):
-            if board[row][col] == 0:
-                return False
-
-    return True
 
 def check_lose(currentRow, currentCol):
-
 
 
     if(currentRow == -1 or currentCol == -1):
@@ -204,7 +181,6 @@ def restart():
 
 
 def bestMove(player = 2):
-    # print("p",player)
     bestScore = -100000
     move = None
 
@@ -235,8 +211,6 @@ def bestMove(player = 2):
                         bestScore = score
                         move = (row,col)
 
-                    # print("s: ",bestScore, move)
-    # print(dict)
     if(-1 < currentRow-1 and currentRow-1 < BOARD_ROWS and -1 < currentCol-1 and currentCol-1 < BOARD_COLS and board[currentRow-1][currentCol-1] == 0 ):
         board[currentRow-1][currentCol-1] = 2
         score = minimax(board,1,playerOneCurrentRow,playerOneCurrentCol,currentRow-1 , currentCol-1,0,False)
@@ -336,7 +310,7 @@ def minimax(board, player, playerOneCurrentRow, playerOneCurrentCol, playerTwoCu
     else:
         result = 0
 
-    if result !=0 :
+    if result !=0:
         return scores[result]
 
     s = ""
@@ -347,8 +321,6 @@ def minimax(board, player, playerOneCurrentRow, playerOneCurrentCol, playerTwoCu
             s = s + str(t)
     if s in dict:
         return dict[s]
-
-    #print("p",player, score)
 
     if(player == 1):
         currentRow = playerOneCurrentRow
@@ -554,25 +526,25 @@ def random_block_square():
         cnt += 1
     draw_figures()
 
+howTOplay = False
 
 def start():
 
-    global LINE_WIDTH, BOARD_ROWS, BOARD_COLS, WIDTH, HEIGHT, SQUARE_SIZE, board, screen, r,s, random_block_list
+    global LINE_WIDTH, BOARD_ROWS, BOARD_COLS, WIDTH, HEIGHT, SQUARE_SIZE, board, screen, r,s, random_block_list, howTOplay
+
     font = pygame.font.SysFont(None, 45)
     font.set_italic(True)
     font2 = pygame.font.SysFont(None, 25)
-    img = font.render('WELCOME to QUEEN\'s TRAP GAME', True, BLACK)
+    img = pygame.image.load('title.png')
     img2 = font.render('Select board size', True, BLACK)
     img3 = font2.render('Developed by Subah Nawar & Humayan Kabir', True, BLACK)
     img4 = pygame.image.load('blur_logo.png')
-    #img4 = pygame.transform.scale(img4, (100,100))
 
-    text_rect = img.get_rect(center=(WIDTH // 2, 100))
-    text_rect2 = img2.get_rect(center=((WIDTH // 2), 250))
+    text_rect2 = img2.get_rect(center=((WIDTH // 2), 230))
     text_rect3 = img3.get_rect(center=(280, 550))
 
     screen.blit(img4, (0, 0))
-    screen.blit(img, text_rect)
+    screen.blit(img,(0, 0))
     screen.blit(img2, text_rect2)
     screen.blit(img3, text_rect3)
 
@@ -583,14 +555,19 @@ def start():
     button_3_6_img = pygame.image.load('button_3_6.png').convert_alpha()
     button_3_7_img = pygame.image.load('button_3_7.png').convert_alpha()
     button_5_3_img = pygame.image.load('button_5_3.png').convert_alpha()
+    button_5_5_img = pygame.image.load('button_5_5.png').convert_alpha()
 
-    button_3_3 = Button(100, 350, button_3_3_img)
-    button_4_4 = Button(300, 350, button_4_4_img)
-    button_4_5 = Button(500, 350, button_4_5_img)
+    how_to_play_btn_img = pygame.image.load('how_to_play.png').convert_alpha()
 
-    button_3_6 = Button(100, 450, button_3_6_img)
-    button_3_7 = Button(300, 450, button_3_7_img)
-    button_5_3 = Button(500, 450, button_5_3_img)
+    button_3_3 = Button(100, 300, button_3_3_img)
+    button_4_4 = Button(300, 300, button_4_4_img)
+    button_4_5 = Button(500, 300, button_4_5_img)
+
+    button_3_6 = Button(100, 380, button_3_6_img)
+    button_3_7 = Button(233, 380, button_3_7_img)
+    button_5_3 = Button(366, 380, button_5_3_img)
+    button_5_5 = Button(500, 380, button_5_5_img)
+    how_to_play_btn = Button(300, 460, how_to_play_btn_img)
 
     select = True
 
@@ -600,11 +577,14 @@ def start():
     button_3_6.draw()
     button_3_7.draw()
     button_5_3.draw()
+    button_5_5.draw()
+    how_to_play_btn.draw()
 
     while select:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_3_3.draw() == True:
@@ -631,32 +611,49 @@ def start():
                     r = 5
                     s = 3
                     select = False
+                elif button_5_5.draw() == True:
+                    r = 5
+                    s = 5
+                    select = False
+                elif how_to_play_btn.draw() == True:
+                    howTOplay = True
+                    select = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    pygame.display.quit()
 
-        # button_5.draw()
-        # button_7.draw()
         pygame.display.update()
+    if(howTOplay):
 
-    LINE_WIDTH = 5
-    BOARD_ROWS = r
-    BOARD_COLS = s
-    WIDTH = s * 100
-    HEIGHT = r * 100
-    SQUARE_SIZE = WIDTH / BOARD_COLS
-    # SQUARE_SIZE_H = HEIGHT / BOARD_ROWS
-    # print(SQUARE_SIZE_W,SQUARE_SIZE_H)
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption('QUEEN\'s TRAP')
+        screen.fill(BG_COLOR)
 
-    screen = pygame.display.set_mode((WIDTH, HEIGHT+100))
-    pygame.display.set_caption('QUEEN\'s TRAP')
-    screen.fill(BG_COLOR)
-    board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        instruct_img = pygame.image.load('instruction.png')
+        screen.blit(instruct_img, (0, 0))
 
-    random_block_square()
+
+
+
+    else:
+
+        LINE_WIDTH = 5
+        BOARD_ROWS = r
+        BOARD_COLS = s
+        WIDTH = s * 100
+        HEIGHT = r * 100
+        SQUARE_SIZE = WIDTH / BOARD_COLS
+
+
+        screen = pygame.display.set_mode((WIDTH, HEIGHT+100))
+        pygame.display.set_caption('QUEEN\'s TRAP')
+        screen.fill(BG_COLOR)
+        board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        draw_lines()
+        random_block_square()
 
 
 def help_text(text):
-
-
-
 
     help_font = pygame.font.SysFont(None, 20)
     help_font.set_italic(True)
@@ -665,217 +662,223 @@ def help_text(text):
     screen.fill(BG_COLOR, help_text_rect)
     pygame.display.update()
     screen.blit(help_font_img,help_text_rect)
+    pygame.display.update()
+
+def help_text_draw(i):
 
 
-# def help_text_computer():
-#     help_font = pygame.font.SysFont(None, 20)
-#     help_font.set_italic(True)
-#     help_font_img = help_font.render('Computer\'s MOVE', True, BLACK)
-#     help_text_rect = help_font_img.get_rect(10, center=(WIDTH // 2, HEIGHT + 50))
-#     screen.fill(BG_COLOR, help_text_rect)
-#     pygame.display.update()
-#     screen.blit(help_font_img, help_text_rect)
-# def help_text_block_computer():
-#     help_font = pygame.font.SysFont(None, 20)
-#     help_font.set_italic(True)
-#     help_font_img = help_font.render('Computer\'s Blocking Square', True, BLACK)
-#     help_text_rect = help_font_img.get_rect(center=(WIDTH // 2, HEIGHT + 50))
-#     screen.fill(BG_COLOR, help_text_rect)
-#     pygame.display.update()
-#     screen.blit(help_font_img, help_text_rect)
-# def help_text_block_human():
-#     help_font = pygame.font.SysFont(None, 20)
-#     help_font.set_italic(True)
-#     help_font_img = help_font.render('Human\'s Block a Square', True, BLACK)
-#     help_text_rect = help_font_img.get_rect(center=(WIDTH // 2, HEIGHT + 50))
-#     screen.fill(BG_COLOR, help_text_rect)
-#     pygame.display.update()
-#     screen.blit(help_font_img, help_text_rect)
-# def gameOver():
-#     help_font = pygame.font.SysFont(None, 20)
-#     help_font.set_italic(True)
-#     help_font_img = help_font.render('Game Over', True, BLACK)
-#     help_text_rect = help_font_img.get_rect(center=(WIDTH // 2, HEIGHT + 50))
-#     screen.fill(BG_COLOR, help_text_rect)
-#     pygame.display.update()
-#     screen.blit(help_font_img, help_text_rect)
+
+    if(WIDTH == 300):
+        x = 0
+    elif WIDTH == 400:
+        x = 50
+    elif WIDTH == 500:
+        x = 100
+    elif WIDTH == 600:
+        x = 150
+    elif WIDTH == 700:
+        x = 200
+
+
+
+
+    text_frame = pygame.image.load('text_frame.png')
+    screen.blit(text_frame, (x, HEIGHT+10))
+    pygame.display.update()
+    if i == 1:
+        img = pygame.image.load('your_move_300.png')
+    elif i == 2:
+        img = pygame.image.load('computer_move.png')
+    elif i == 3:
+        img = pygame.image.load('block_a_square.png')
+    elif i == 4:
+        img = pygame.image.load('computer_blocking.png')
+    elif i == 5:
+        img = pygame.image.load('game_over.png')
+
+    screen.blit(img, (x, HEIGHT))
+    pygame.display.update()
+
+
+
 block = -1
 start()
-draw_lines()
 
+if not howTOplay:
+    draw_lines()
+    help_text_draw(1)
 back_menu = False
 
-# MAINLOOP---------
+
 while True:
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
-        if(back_menu and block==1 or block == -1 and not game_over):
-            help_text('HUMAN\'s MOVE')
+        if(back_menu ):
+            help_text_draw(1)
             back_menu = False
 
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and  not game_over and (block == -1 or block == 1):
 
-
-
-            # print("hi")
-
-            mouseX = event.pos[0] # x
-            mouseY = event.pos[1] # y
+            mouseX = event.pos[0]
+            mouseY = event.pos[1]
 
             clicked_row = int(mouseY // SQUARE_SIZE)
             clicked_col = int(mouseX // SQUARE_SIZE)
-            print('Mouse X position: ' + str(mouseX))
-            print('Mouse Y position: ' + str(mouseY))
-            print('Clicked row: ' + str(clicked_row))
-            print('Clicked col: ' + str(clicked_col))
+            # print('Mouse X position: ' + str(mouseX))
+            # print('Mouse Y position: ' + str(mouseY))
+            # print('Clicked row: ' + str(clicked_row))
+            # print('Clicked col: ' + str(clicked_col))
 
 
             if available_square( clicked_row, clicked_col, 1 ):
+
+                global dot_li
+
+                dot_li = available_square_list(playerOneCurrentRow, playerOneCurrentCol)
+
+                for (x, y) in dot_li:
+                    screen.blit(BG_DOT, (int(y * SQUARE_SIZE), int(x * SQUARE_SIZE)))
+                pygame.display.update()
+
+
                 player = 1
                 mark_square( clicked_row, clicked_col, player )
 
                 playerOneCurrentRow = clicked_row
                 playerOneCurrentCol = clicked_col
-                # print('Player One Current Row and Col: (',str(playerOneCurrentRow)+','+str(playerOneCurrentCol)+')')
-
                 draw_figures()
 
-                li = available_square_list(playerOneCurrentRow, playerOneCurrentCol)
+                help_text_draw(2)
 
-                # for (x,y) in li:
-                #     screen.blit(WHITE_DOT, (x, y))
+                pygame.time.delay(5000)
 
-                help_text('Computer\'s MOVE')
-                pygame.display.update()
-                pygame.time.delay(1000)
-
-                print("Draw")
                 if check_lose(playerTwoCurrentRow,playerTwoCurrentCol):
                     losePlayer = 2
                     game_over = True
+                    help_text_draw(5)
                     draw_figures()
-                    help_text('Game Over')
-                    pygame.display.update()
-
 
 
                 else:
+
                     player = 2
                     bestMove(player)
-                    # print(dict)
+                    draw_figures()
 
-                    if check_lose(playerOneCurrentRow, playerOneCurrentCol ):
+                    dot_li = available_square_list(playerOneCurrentRow, playerOneCurrentCol)
+
+                    for (x,y) in dot_li:
+                        screen.blit(GREEN_DOT, (int(y * SQUARE_SIZE), int(x * SQUARE_SIZE)))
+                    pygame.display.update()
+
+
+                    if check_lose (playerOneCurrentRow, playerOneCurrentCol ):
                         losePlayer = 1
                         game_over = True
+                        help_text_draw(5)
                         draw_figures()
-                        help_text('Game Over')
-                        pygame.display.update()
+
                         # print("********************************************************")
                         # print("Player 1 lost.\nRestarting game : Press -> R")
                         # print("Quit game : Press -> Q")
                         # print("********************************************************")
                     
-                    draw_figures()
-                    help_text('HUMAN\'s MOVE')
+                    else:
+
+                        if block == -1:
+                            block = 1
+                            help_text_draw(1)
+                        else:
+                            block = 2
+                            help_text_draw(3)
+                            for x in range(BOARD_ROWS):
+                                for y in range(BOARD_COLS):
+                                    if (board[x][y] == 0):
+                                        screen.blit(GREEN_DOT, (int(y * SQUARE_SIZE), int(x * SQUARE_SIZE)))
 
 
-            if block == -1:
-                block = 1
-            else:
-                block = 2
-                pygame.time.delay(1000)
-                help_text('BLOCK a Square')
-            # print(playerOneCurrentRow,playerOneCurrentCol," ",playerTwoCurrentRow, playerTwoCurrentCol)
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and not game_over and block == 2:
-            # print("hi 2")
 
-            mouseX = event.pos[0]  # x
-            mouseY = event.pos[1]  # y
+            for x in range(BOARD_ROWS):
+                for y in range(BOARD_COLS):
+                    if (board[x][y] == 0):
+                        screen.blit(BG_DOT, (int(y * SQUARE_SIZE), int(x * SQUARE_SIZE)))
+
+
+            pygame.display.update()
+            mouseX = event.pos[0]
+            mouseY = event.pos[1]
 
             clicked_row = int(mouseY // SQUARE_SIZE)
             clicked_col = int(mouseX // SQUARE_SIZE)
-            print('Mouse X position: ' + str(mouseX))
-            print('Mouse Y position: ' + str(mouseY))
-            print('Clicked row: ' + str(clicked_row))
-            print('Clicked col: ' + str(clicked_col))
+            # print('Mouse X position: ' + str(mouseX))
+            # print('Mouse Y position: ' + str(mouseY))
+            # print('Clicked row: ' + str(clicked_row))
+            # print('Clicked col: ' + str(clicked_col))
 
-            if board[clicked_row][clicked_col] == 0:
+            if board[clicked_row][clicked_col] == 0 and not game_over:
                 mark_square(clicked_row, clicked_col, 1)
                 draw_figures()
-                help_text('Computer Blocking a SQUARE')
-                pygame.display.update()
-                pygame.time.delay(1000)
+                help_text_draw(4)
+                pygame.time.delay(5000)
 
             if check_lose(playerTwoCurrentRow, playerTwoCurrentCol):
                 losePlayer = 2
                 game_over = True
+                help_text_draw(5)
                 draw_figures()
-                help_text('Game Over')
-                pygame.display.update()
 
             else:
+                print("Hello")
+
                 blockable_square_list = available_square_list(playerOneCurrentRow, playerOneCurrentCol)
-                # x = playerOneCurrentRow
-                # y = playerOneCurrentCol
-
-                # if x - 1 >= 0 and y - 1 >= 0 and x - 1 < BOARD_ROWS and y - 1 < BOARD_COLS and board[x - 1][y - 1] == 0 :
-                #     blockable_square_2.append((x-1, y-1))
-                # if x - 1 >= 0 and y >= 0 and x - 1 < BOARD_ROWS and y < BOARD_COLS and board[x - 1][y] == 0:
-                #     blockable_square_2.append((x-1, y))
-                # if x - 1 >= 0 and y + 1 >= 0 and x - 1 < BOARD_ROWS and y + 1 < BOARD_COLS and board[x - 1][y + 1] == 0:
-                #     blockable_square_2.append((x-1, y + 1))
-                # if x >= 0 and y + 1 >= 0 and x  < BOARD_ROWS and y + 1 < BOARD_COLS and board[x][y + 1] == 0:
-                #     blockable_square_2.append((x, y + 1))
-                # if x+1 >= 0 and y + 1 >= 0 and x + 1 < BOARD_ROWS and y + 1 < BOARD_COLS and board[x + 1][y + 1] == 0:
-                #     blockable_square_2.append((x + 1, y + 1))
-                #
-                # if x+1 >= 0 and y >= 0 and x + 1 < BOARD_ROWS and y< BOARD_COLS and board[x + 1][y] == 0:
-                #     blockable_square_2.append((x + 1, y))
-                # if x+1 >= 0 and y - 1 >= 0 and x + 1 < BOARD_ROWS and y - 1 < BOARD_COLS and board[x + 1][y - 1] == 0:
-                #     blockable_square_2.append((x + 1, y - 1))
-                # if x  >= 0 and y - 1 >= 0 and x < BOARD_ROWS and y - 1 < BOARD_COLS and board[x ][y - 1] == 0:
-                #     blockable_square_2.append((x, y - 1))
-
-                # print(blockable_square_list,"\n")
 
                 pq = PriorityQueue()
-                for (u, v) in blockable_square_list:
-                    # print(u,v)
-                    li = available_square_list(u, v)
-                    # print(li)
-                    pq.put((len(li) * -1, (u, v)))
 
-                xy = pq.get()
 
-                (x, y) = xy[1]
-                while not pq.empty():
-                    current = pq.get()
-                    # print(current)
+                print("Empty",blockable_square_list)
 
-                # print(x, y)
+                if len(blockable_square_list) != 0:
+                    for (u, v) in blockable_square_list:
+                        li = available_square_list(u, v)
+                        pq.put((len(li) * -1, (u, v)))
 
-                mark_square(x, y, 2)
+                    xy = pq.get()
+                    print("xy: ",xy)
+                    (x, y) = xy[1]
+                    while not pq.empty():
+                        current = pq.get()
+
+                    mark_square(x, y, 2)
 
                 if check_lose(playerOneCurrentRow,playerOneCurrentCol):
+
                     losePlayer = 1
                     game_over = True
+                    help_text_draw(5)
                     draw_figures()
-                    help_text('Game Over')
-                    pygame.display.update()
-            block = 1
 
-            draw_figures()
-            help_text('HUMAN\'s MOVE')
+                else:
+                    block = 1
+                    help_text_draw(1)
+                    draw_figures()
+                    dot_li = available_square_list(playerOneCurrentRow, playerOneCurrentCol)
+
+                    for (x, y) in dot_li:
+                        screen.blit(GREEN_DOT, (int(y * SQUARE_SIZE), int(x * SQUARE_SIZE)))
+                    pygame.display.update()
+
 
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_r:
+            if event.key == pygame.K_r and not howTOplay:
                 restart()
-                help_text('HUMAN\'s MOVE')
+                help_text_draw(1)
                 random_block_square()
                 player = 1
                 game_over = False
@@ -891,8 +894,8 @@ while True:
                 screen = pygame.display.set_mode((WIDTH, HEIGHT))
                 pygame.display.set_caption('QUEEN\'s TRAP')
                 screen.fill(BG_COLOR)
+                howTOplay = False
                 start()
-                draw_lines()
                 player = 1
                 game_over = False
                 losePlayer = 0
