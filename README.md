@@ -4,7 +4,7 @@ Queen's Trap board game is a two-player “don’t get stranded” abstract stra
 Players alternate turns moving a single piece from one cell to another on a board. The board is initially filled with squares except the starting points of both players.
 The first player with no remaining legal moves loses, and the opponent is declared winner.
 
-![readme](https://github.com/Rupok1/Queens_Trap-AI-Game/assets/63110863/c7353211-3011-489e-aa16-09d029839e08)
+<!--![readme](https://github.com/Rupok1/Queens_Trap-AI-Game/assets/63110863/c7353211-3011-489e-aa16-09d029839e08)-->
 
 
 ## How-To-Play
