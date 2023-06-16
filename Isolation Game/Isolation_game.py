@@ -722,7 +722,7 @@ while True:
             back_menu = False
 
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and  not game_over and (block == -1 or block == 1):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and  not game_over and (block == -1 or block == 1) and howTOplay == False:
 
             mouseX = event.pos[0]
             mouseY = event.pos[1]
@@ -851,8 +851,8 @@ while True:
                     xy = pq.get()
                     print("xy: ",xy)
                     (x, y) = xy[1]
-                    while not pq.empty():
-                        current = pq.get()
+                    # while not pq.empty():
+                    #     current = pq.get()
 
                     mark_square(x, y, 2)
 
