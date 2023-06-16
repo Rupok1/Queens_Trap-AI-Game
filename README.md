@@ -9,5 +9,5 @@ The first player with no remaining legal moves loses, and the opponent is declar
 
 ## How-To-Play
 - Install pygame using "pip install pygame" in command line terminal.
-- Open the Isolation_game.py using any python ide (VSCode/Spyder is preferrable).
+- Open the Isolation_game.py using any python ide (VSCode/Pycharm is preferrable).
 - Run the code
